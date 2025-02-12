@@ -79,7 +79,12 @@ function App() {
           </div>
           <div className="flex justify-center">
             <div className="w-64 h-64 rounded-full bg-gradient-to-br from-[#76b900] to-[#76b900]/20 flex items-center justify-center">
-              <span className="text-gray-400 text-sm">Your Image Here</span>
+              {/* <span className="text-gray-400 text-sm">Your Image Here</span> */}
+              <img 
+                src="https://media.licdn.com/dms/image/v2/D4D03AQHQ4rsKLeeRYw/profile-displayphoto-shrink_800_800/B4DZTx6G8dHkAc-/0/1739225329861?e=1744848000&v=beta&t=oqVEgBjturGJgTZf73mwfawVwYei3VwW_SrodIiW164" 
+                alt="Ruben"
+                className="w-[200px] h-[200px] rounded-full border-4 border-[#76b900] shadow-[0_0_15px_#76b900]"
+              />
             </div>
           </div>
         </div>
