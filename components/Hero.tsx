@@ -101,7 +101,11 @@ export default function Hero() {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src="/hero.webp"
-                  alt="Ruben Otano — AI/ML Architect Portfolio"
+                  alt="Ruben Otano — AI/ML Engineer"
+                  width={400}
+                  height={400}
+                  fetchPriority="high"
+                  decoding="async"
                   className="h-full w-full object-cover"
                   onError={() => setImgOk(false)}
                 />

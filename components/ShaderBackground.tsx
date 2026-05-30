@@ -182,10 +182,11 @@ export default function ShaderBackground({ className = '', intensity = 1 }: Prop
     window.addEventListener('mousemove', onMove);
 
     let raf = 0;
+    let running = false;
     const start = performance.now();
     const target = { x: 0.5, y: 0.5 };
 
-    const render = (now: number) => {
+    const draw = (now: number) => {
       const time = prefersReduced ? 0 : (now - start) / 1000;
       // ease mouse
       target.x += (mouse.current.x - target.x) * 0.05;
@@ -196,15 +197,47 @@ export default function ShaderBackground({ className = '', intensity = 1 }: Prop
       gl.uniform2f(uMouse, target.x, target.y);
       gl.uniform1f(uIntensity, intensity);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-      if (!prefersReduced) raf = requestAnimationFrame(render);
     };
-    raf = requestAnimationFrame(render);
-    if (prefersReduced) render(start); // single frame
+
+    const frame = (now: number) => {
+      draw(now);
+      if (!prefersReduced && running) raf = requestAnimationFrame(frame);
+    };
+    const startLoop = () => {
+      if (prefersReduced) {
+        draw(performance.now());
+        return;
+      }
+      if (running) return;
+      running = true;
+      raf = requestAnimationFrame(frame);
+    };
+    const stopLoop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+    };
+
+    // Only run the shader while the hero is on screen and the tab is visible
+    // (saves GPU/CPU on scroll and when backgrounded).
+    let onScreen = false;
+    const update = () =>
+      onScreen && !document.hidden ? startLoop() : stopLoop();
+    const io = new IntersectionObserver(
+      ([e]) => {
+        onScreen = e.isIntersecting;
+        update();
+      },
+      { threshold: 0 }
+    );
+    io.observe(canvas);
+    const onVisibility = () => update();
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
-      cancelAnimationFrame(raf);
+      stopLoop();
+      io.disconnect();
       ro.disconnect();
+      document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('mousemove', onMove);
       gl.deleteProgram(program);
       gl.deleteBuffer(buf);
